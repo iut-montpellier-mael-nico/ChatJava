@@ -1,5 +1,3 @@
-import sun.jvm.hotspot.utilities.ObjectReader;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -15,8 +13,8 @@ public class Client {
 
         final Socket clientSocket;
         final BufferedReader in;
-        final ObjectInputStream myIn;
-        final ObjectOutputStream myOut;
+        final InputStream myIn;
+        final OutputStream myOut;
         final PrintWriter out;
         final Scanner sc = new Scanner(System.in);//pour lire à partir du clavier
         final KeyPair keyPair = GenerateurKey.generateKeyPair();
@@ -33,13 +31,13 @@ public class Client {
 
             //flux pour envoyer
             //out = new PrintWriter(clientSocket.getOutputStream());
-            myOut = new ObjectOutputStream(clientSocket.getOutputStream());
+            myOut = clientSocket.getOutputStream();
             //myOut.write();
             //flux pour recevoir
             //in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            myIn = new ObjectInputStream(clientSocket.getInputStream());
+            myIn = clientSocket.getInputStream();
             //inkey = new ObjectInputStream(new InputStreamReader(clientSocket.getInputStream()));
-            byte[]keybyte = myIn.readObject().toString().getBytes();
+            int keybyte = myIn.read();
             publicKeyRecue = new SecretKeySpec(keybyte, "RSA");
 
             //out.println(clePublique);
@@ -79,17 +77,17 @@ public class Client {
                 @Override
                 public void run() {
                     try {
-                        msg = in.readLine();
+                        msg = myIn.readObject();
                         while(msg!=null){
-                            byte[]msgRecueEncode = msg.getBytes();
+                            byte[]msgRecueEncode = msg.get;
                             byte[]msgRecueDecodede = Decodage.decodeMessage(clePrivee, msgRecueEncode);
                             System.out.println("Serveur : "+msgRecueDecodede);
                             msg = in.readLine();
                         }
-                        System.out.println("Serveur déconecté");
+                        System.out.println("Serveur déconnecté");
                         out.close();
                         clientSocket.close();
-                    } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+                    } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                 }

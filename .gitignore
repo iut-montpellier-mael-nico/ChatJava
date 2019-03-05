@@ -6,3 +6,6 @@
 .idea/project-template.xml
 .idea/vcs.xml
 .idea/workspace.xml
+.idea/*
+
+out/*
